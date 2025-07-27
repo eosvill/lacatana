@@ -5,6 +5,9 @@ exports.handler = async (event) => {
         return { statusCode: 405, body: 'Method Not Allowed' };
     }
 
+    console.log('Raw event body:', event.body);
+    console.log('isBase64Encoded:', event.isBase64Encoded);
+
     try {
         const data = JSON.parse(event.body);
         console.log('Form submission received:', data);
