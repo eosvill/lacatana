@@ -179,16 +179,70 @@
 
         <!-- Contacto Section -->
         <section id="contacto" class="py-20 px-6 bg-white">
-            <div class="max-w-4xl mx-auto text-center bg-[#4A573E] text-white p-10 rounded-lg shadow-2xl">
-                <h2 class="text-4xl md:text-5xl font-bold">¿Listo para celebrar?</h2>
-                <p class="mt-6 text-lg leading-relaxed max-w-2xl mx-auto">
-                    Tu próximo gran recuerdo empieza con un simple mensaje. Escribinos y te contamos todo sobre nuestras fechas disponibles y tarifas. ¡Estamos para ayudarte a planificar el evento de tus sueños!
+            <div class="max-w-4xl mx-auto bg-[#4A573E] text-white p-10 rounded-lg shadow-2xl">
+                <h2 class="text-4xl md:text-5xl font-bold text-center">¿Listo para celebrar?</h2>
+                <p class="mt-6 text-lg leading-relaxed text-center max-w-2xl mx-auto">
+                    Tu próximo gran recuerdo empieza con un simple mensaje. Completa el formulario y nos pondremos en contacto contigo.
                 </p>
-                <a href="https://wa.me/5491159384600?text=Hola,%20quisiera%20consultar%20por%20el%20alquiler%20de%20la%20quinta." target="_blank" class="mt-8 inline-block bg-[#D4A373] text-white font-bold py-4 px-10 rounded-full text-xl hover:bg-[#BF8B5A] transition-colors duration-300 shadow-lg">
-                    Contactar por WhatsApp
-                </a>
+                <form id="contact-form" class="mt-8 space-y-6">
+                    <div>
+                        <label for="name" class="block text-lg font-medium text-white">Nombre:</label>
+                        <input type="text" id="name" name="name" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#D4A373] focus:border-[#D4A373] sm:text-sm text-gray-800">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-lg font-medium text-white">Correo Electrónico:</label>
+                        <input type="email" id="email" name="email" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#D4A373] focus:border-[#D4A373] sm:text-sm text-gray-800">
+                    </div>
+                    <div>
+                        <label for="message" class="block text-lg font-medium text-white">Mensaje:</label>
+                        <textarea id="message" name="message" rows="5" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#D4A373] focus:border-[#D4A373] sm:text-sm text-gray-800"></textarea>
+                    </div>
+                    <button type="submit" class="w-full inline-block bg-[#D4A373] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-[#BF8B5A] transition-colors duration-300 shadow-lg">
+                        Enviar Mensaje
+                    </button>
+                    <div id="form-message" class="mt-4 text-center text-lg font-semibold"></div>
+                </form>
             </div>
         </section>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const formProps = Object.fromEntries(formData);
+            const formMessage = document.getElementById('form-message');
+
+            formMessage.textContent = 'Enviando...';
+            formMessage.className = 'mt-4 text-center text-lg font-semibold text-gray-300';
+
+            try {
+                const response = await fetch('/.netlify/functions/submit-form', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formProps),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    formMessage.textContent = '¡Mensaje enviado con éxito! Gracias por contactarnos.';
+                    formMessage.className = 'mt-4 text-center text-lg font-semibold text-green-400';
+                    form.reset(); // Clear the form
+                } else {
+                    formMessage.textContent = `Error: ${result.message || 'Algo salió mal.'}`;
+                    formMessage.className = 'mt-4 text-center text-lg font-semibold text-red-400';
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                formMessage.textContent = 'Error de conexión. Inténtalo de nuevo más tarde.';
+                formMessage.className = 'mt-4 text-center text-lg font-semibold text-red-400';
+            }
+        });
+    </script>
     </main>
 
     <!-- Footer -->
